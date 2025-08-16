@@ -66,7 +66,7 @@ const ChartDashboard = ({ transactions, categories, selectedMonth }) => {
             <div className="flex justify-between text-sm font-medium text-gray-700">
               <span>{item.month}</span>
               <span className={`${item.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                Balance: ${item.balance.toFixed(0)}
+                Balance: ₹{item.balance.toFixed(0)}
               </span>
             </div>
             <div className="space-y-1">
@@ -79,7 +79,7 @@ const ChartDashboard = ({ transactions, categories, selectedMonth }) => {
                     style={{ width: `${(item.income / maxValue) * 100}%` }}
                   />
                 </div>
-                <span className="text-xs text-green-700 w-16 text-right">${item.income.toFixed(0)}</span>
+                <span className="text-xs text-green-700 w-16 text-right">₹{item.income.toFixed(0)}</span>
               </div>
               {/* Expense Bar */}
               <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ const ChartDashboard = ({ transactions, categories, selectedMonth }) => {
                     style={{ width: `${(item.expenses / maxValue) * 100}%` }}
                   />
                 </div>
-                <span className="text-xs text-red-700 w-16 text-right">${item.expenses.toFixed(0)}</span>
+                <span className="text-xs text-red-700 w-16 text-right">₹{item.expenses.toFixed(0)}</span>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@ const ChartDashboard = ({ transactions, categories, selectedMonth }) => {
               />
               <span className="flex-1 text-sm text-gray-700">{item.category}</span>
               <span className="text-sm font-medium text-gray-800">
-                ${item.amount.toFixed(0)} ({((item.amount / total) * 100).toFixed(1)}%)
+                ₹{item.amount.toFixed(0)} ({((item.amount / total) * 100).toFixed(1)}%)
               </span>
             </div>
           ))}
@@ -241,7 +241,7 @@ const ChartDashboard = ({ transactions, categories, selectedMonth }) => {
             <div key={index} className="text-center">
               <p className="font-medium">{item.month}</p>
               <p className={`${item.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                ${item.balance.toFixed(0)}
+                ₹{item.balance.toFixed(0)}
               </p>
             </div>
           ))}

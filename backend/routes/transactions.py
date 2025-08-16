@@ -19,7 +19,7 @@ async def get_transactions(
             # Validate month format
             try:
                 datetime.strptime(month, "%Y-%m")
-                query["transaction_date"] = {"$regex": f"^{month}"}
+                query["transaction_date"] = {"₹regex": f"^{month}"}
             except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
@@ -92,7 +92,7 @@ async def get_monthly_summary(
             raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
         # Get transactions for the month
-        cursor = db.transactions.find({"transaction_date": {"$regex": f"^{month}"}})
+        cursor = db.transactions.find({"transaction_date": {"₹regex": f"^{month}"}})
         transactions = await cursor.to_list(1000)
         
         total_income = sum(t["amount"] for t in transactions if t["transaction_type"] == "income")

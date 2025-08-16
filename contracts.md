@@ -1,4 +1,4 @@
-# Budget Planner - Backend Integration Contracts
+# FinTraQ - Backend Integration Contracts
 
 ## API Contracts
 
@@ -50,7 +50,7 @@
 2. **Transactions array** - Replace with database-stored transactions
 
 ### Frontend Components to Update:
-1. **BudgetPlanner.jsx** - Replace localStorage with API calls
+1. **FinTraQ.jsx** - Replace localStorage with API calls
 2. **IncomeForm.jsx** - Submit to `/api/transactions`
 3. **ExpenseForm.jsx** - Submit to `/api/transactions`
 4. **CategoryManager.jsx** - Use `/api/categories` endpoints

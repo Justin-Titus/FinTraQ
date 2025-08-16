@@ -97,7 +97,7 @@ if __name__ == "__main__":
     from motor.motor_asyncio import AsyncIOMotorClient
     
     mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-    db_name = os.environ.get('DB_NAME', 'budget_planner')
+    db_name = os.environ.get('DB_NAME', 'FinTraQ')
     
     client = AsyncIOMotorClient(mongo_url)
     db = client[db_name]

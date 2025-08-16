@@ -23,7 +23,7 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app
-app = FastAPI(title="Budget Planner API", version="1.0.0")
+app = FastAPI(title="FinTraQ API", version="1.0.0")
 
 # Include routers
 app.include_router(categories_router)
@@ -34,7 +34,7 @@ api_router = APIRouter(prefix="/api")
 
 @api_router.get("/")
 async def root():
-    return {"message": "Budget Planner API is running!", "version": "1.0.0"}
+    return {"message": "FinTraQ API is running!", "version": "1.0.0"}
 
 @api_router.get("/health")
 async def health_check():
@@ -63,7 +63,7 @@ logger = logging.getLogger(__name__)
 async def startup_event():
     """Initialize database and seed data on startup"""
     try:
-        logger.info("🚀 Starting Budget Planner API...")
+        logger.info("🚀 Starting FinTraQ API...")
         
         # Test database connection
         await db.command("ping")
@@ -72,7 +72,7 @@ async def startup_event():
         # Seed database with initial data
         await seed_database(db)
         
-        logger.info("🎉 Budget Planner API started successfully!")
+        logger.info("🎉 FinTraQ API started successfully!")
     except Exception as e:
         logger.error(f"❌ Startup failed: {e}")
         raise
@@ -89,4 +89,4 @@ async def shutdown_event():
 # Root endpoint redirect
 @app.get("/")
 async def redirect_to_api():
-    return {"message": "Welcome to Budget Planner API", "docs": "/docs", "api": "/api"}
+    return {"message": "Welcome to FinTraQ API", "docs": "/docs", "api": "/api"}

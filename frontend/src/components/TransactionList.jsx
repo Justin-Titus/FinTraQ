@@ -160,7 +160,7 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
                           <p className={`font-semibold ${
                             transaction.type === 'income' ? 'text-green-800' : 'text-red-800'
                           }`}>
-                            ${transaction.amount.toFixed(2)}
+                            ₹{transaction.amount.toFixed(2)}
                           </p>
                           <Badge 
                             variant="secondary" 

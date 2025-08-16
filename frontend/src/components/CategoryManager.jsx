@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { PlusCircle, Tag, DollarSign, Minus } from 'lucide-react';
+import { PlusCircle, Tag, IndianRupee, Minus } from 'lucide-react';
 
 const CategoryManager = ({ categories = [], onAddCategory }) => {
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -62,7 +62,7 @@ const CategoryManager = ({ categories = [], onAddCategory }) => {
             <label
               key={opt.value}
               htmlFor={opt.value}
-              className={`flex items-center gap-1 cursor-pointer ${opt.color}`}
+              className={`flex items-center gap-1 cursor-pointer ₹{opt.color}`}
             >
               <input
                 type="radio"
@@ -99,7 +99,7 @@ const CategoryManager = ({ categories = [], onAddCategory }) => {
         <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-800">
-              <DollarSign className="h-5 w-5" />
+              <IndianRupee className="h-5 w-5" />
               Income Categories
             </CardTitle>
           </CardHeader>

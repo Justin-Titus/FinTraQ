@@ -5,7 +5,7 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Textarea } from './ui/textarea';
-import { TrendingDown, DollarSign } from 'lucide-react';
+import { TrendingDown, IndianRupee } from 'lucide-react';
 
 const ExpenseForm = ({ categories, onSubmit }) => {
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ const ExpenseForm = ({ categories, onSubmit }) => {
           <div className="space-y-2">
             <Label htmlFor="expense-amount" className="text-red-700">Amount</Label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-red-600" />
+              <IndianRupee className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-red-600" />
               <Input
                 id="expense-amount"
                 type="number"

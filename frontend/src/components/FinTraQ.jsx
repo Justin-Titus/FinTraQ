@@ -15,7 +15,7 @@ import CategoryManager from './CategoryManager';
 import ChartDashboard from './ChartDashboard';
 import TransactionList from './TransactionList';
 
-const BudgetPlanner = () => {
+const FinTraQ = () => {
   const { toast } = useToast();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -89,7 +89,7 @@ const BudgetPlanner = () => {
       
       toast({
         title: "Transaction Added",
-        description: `${transactionData.type === 'income' ? 'Income' : 'Expense'} of $${transactionData.amount} added successfully.`,
+        description: `${transactionData.type === 'income' ? 'Income' : 'Expense'} of ₹${transactionData.amount} added successfully.`,
       });
     } catch (err) {
       const errorMessage = handleApiError(err);
@@ -151,7 +151,7 @@ const addCategory = async (categoryName, categoryType) => {
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-yellow-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="h-12 w-12 animate-spin text-orange-500 mx-auto" />
-          <h2 className="text-2xl font-semibold text-gray-800">Loading Budget Planner...</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Loading FinTraQ...</h2>
           <p className="text-gray-600">Please wait while we fetch your data</p>
         </div>
       </div>
@@ -181,7 +181,7 @@ const addCategory = async (categoryName, categoryType) => {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-gray-800 flex items-center justify-center gap-2">
             <Wallet className="h-10 w-10 text-orange-500" />
-            Budget Planner
+            FinTraQ - Budget Planner
           </h1>
           <p className="text-gray-600">Track your income and expenses with ease</p>
         </div>
@@ -208,7 +208,7 @@ const addCategory = async (categoryName, categoryType) => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-green-700">Total Income</p>
-                    <p className="text-2xl font-bold text-green-800">${summary.totalIncome.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-green-800">₹{summary.totalIncome.toFixed(2)}</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-green-600" />
                 </div>
@@ -220,7 +220,7 @@ const addCategory = async (categoryName, categoryType) => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-red-700">Total Expenses</p>
-                    <p className="text-2xl font-bold text-red-800">${summary.totalExpenses.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-red-800">₹{summary.totalExpenses.toFixed(2)}</p>
                   </div>
                   <TrendingDown className="h-8 w-8 text-red-600" />
                 </div>
@@ -233,7 +233,7 @@ const addCategory = async (categoryName, categoryType) => {
                   <div>
                     <p className={`text-sm font-medium ${summary.balance >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>Balance</p>
                     <p className={`text-2xl font-bold ${summary.balance >= 0 ? 'text-blue-800' : 'text-orange-800'}`}>
-                      ${summary.balance.toFixed(2)}
+                      ₹{summary.balance.toFixed(2)}
                     </p>
                     <Badge variant={summary.balance >= 0 ? 'default' : 'destructive'} className="mt-1">
                       {summary.balance >= 0 ? 'Surplus' : 'Deficit'}
@@ -287,4 +287,4 @@ const addCategory = async (categoryName, categoryType) => {
   );
 };
 
-export default BudgetPlanner;
+export default FinTraQ;

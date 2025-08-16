@@ -2,14 +2,14 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "./components/ui/toaster";
-import BudgetPlanner from "./components/BudgetPlanner";
+import FinTraQ from "./components/FinTraQ";
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<BudgetPlanner />} />
+          <Route path="/" element={<FinTraQ />} />
         </Routes>
         <Toaster />
       </BrowserRouter>
