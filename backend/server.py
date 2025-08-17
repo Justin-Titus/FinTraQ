@@ -1,92 +1,76 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
-from pathlib import Path
 
-# Import routes
 from routes.categories import router as categories_router
 from routes.transactions import router as transactions_router
-
-# Import seeding
-from seed_data import seed_database
 from database import get_database
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+# ---------- Setup ----------
+load_dotenv()
+logger = logging.getLogger("fintraq")
+logging.basicConfig(level=logging.INFO)
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+MONGO_URL = os.environ.get("MONGO_URL")
+DB_NAME = os.environ.get("DB_NAME", "FinTraQ")
+PORT = int(os.environ.get("PORT", "8000"))
 
-# Create the main app
-app = FastAPI(title="FinTraQ API", version="1.0.0")
+if not MONGO_URL:
+    raise RuntimeError("MONGO_URL is not set")
 
-# Include routers
-app.include_router(categories_router)
-app.include_router(transactions_router)
+# Create app
+app = FastAPI(title="FinTraQ API")
 
-# Original API router for backward compatibility
-api_router = APIRouter(prefix="/api")
+# CORS
+cors_origins_raw = os.environ.get("CORS_ORIGINS", "")
+allow_origins = [o.strip() for o in cors_origins_raw.split(",") if o.strip()] or ["*"]
 
-@api_router.get("/")
-async def root():
-    return {"message": "FinTraQ API is running!", "version": "1.0.0"}
-
-@api_router.get("/health")
-async def health_check():
-    return {"status": "healthy", "database": "connected"}
-
-# Include the original router
-app.include_router(api_router)
-
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=allow_origins,
     allow_credentials=True,
-    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+# Mongo client (global)
+client = AsyncIOMotorClient(MONGO_URL)
+db = client[DB_NAME]
 
+# Inject our db into dependency
+# database.get_database returns the shared db, so we override its module-level value
+import database as _dbmod
+_dbmod.client = client
+_dbmod.db = db
+
+# ---------- Routers ----------
+app.include_router(categories_router)
+app.include_router(transactions_router)
+
+# ---------- Lifecycle ----------
 @app.on_event("startup")
-async def startup_event():
-    """Initialize database and seed data on startup"""
+async def on_startup():
     try:
-        logger.info("🚀 Starting FinTraQ API...")
-        
-        # Test database connection
         await db.command("ping")
-        logger.info("✅ Database connection successful")
-        
-        # Seed database with initial data
-        await seed_database(db)
-        
-        logger.info("🎉 FinTraQ API started successfully!")
+        logger.info("✅ Connected to MongoDB and ping successful")
+        # Optional: seed database (uncomment if you want initial data)
+        # from seed_data import seed_database
+        # await seed_database(db)
     except Exception as e:
-        logger.error(f"❌ Startup failed: {e}")
+        logger.exception(f"❌ Startup error: {e}")
         raise
 
 @app.on_event("shutdown")
-async def shutdown_event():
-    """Clean up on shutdown"""
+async def on_shutdown():
     try:
         client.close()
-        logger.info("✅ Database connection closed")
+        logger.info("✅ MongoDB connection closed")
     except Exception as e:
-        logger.error(f"❌ Shutdown error: {e}")
+        logger.exception(f"❌ Shutdown error: {e}")
 
-# Root endpoint redirect
 @app.get("/")
-async def redirect_to_api():
+async def root():
     return {"message": "Welcome to FinTraQ API", "docs": "/docs", "api": "/api"}
