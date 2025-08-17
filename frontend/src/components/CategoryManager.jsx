@@ -5,9 +5,9 @@ import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
-import { PlusCircle, Tag, IndianRupee, Minus } from 'lucide-react';
+import { PlusCircle, Tag, IndianRupee, Minus, Trash2 } from 'lucide-react';
 
-const CategoryManager = ({ categories = [], onAddCategory }) => {
+const CategoryManager = ({ categories = [], onAddCategory, onDeleteCategory }) => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryType, setNewCategoryType] = useState('income'); // default type
 
@@ -109,10 +109,17 @@ const CategoryManager = ({ categories = [], onAddCategory }) => {
                 <Badge 
                   key={category.id} 
                   variant="secondary" 
-                  className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200 transition-colors"
+                  className="bg-green-100 text-green-800 border-green-200 hover:bg-green-200 transition-colors group relative"
                 >
                   <Tag className="h-3 w-3 mr-1" />
                   {category.name}
+                  <button
+                    onClick={() => onDeleteCategory(category.id)}
+                    className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800"
+                    title="Delete category"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                 </Badge>
               ))}
             </div>
@@ -136,10 +143,17 @@ const CategoryManager = ({ categories = [], onAddCategory }) => {
                 <Badge 
                   key={category.id} 
                   variant="secondary" 
-                  className="bg-red-100 text-red-800 border-red-200 hover:bg-red-200 transition-colors"
+                  className="bg-red-100 text-red-800 border-red-200 hover:bg-red-200 transition-colors group relative"
                 >
                   <Tag className="h-3 w-3 mr-1" />
                   {category.name}
+                  <button
+                    onClick={() => onDeleteCategory(category.id)}
+                    className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800"
+                    title="Delete category"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                 </Badge>
               ))}
             </div>

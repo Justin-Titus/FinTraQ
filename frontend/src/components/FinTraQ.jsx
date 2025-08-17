@@ -101,27 +101,43 @@ const FinTraQ = () => {
     }
   };
 
-  // replace existing addCategory with this
-const addCategory = async (categoryName, categoryType) => {
-  try {
-    // send both name and type
-    const newCategory = await categoriesAPI.create({ name: categoryName, type: categoryType });
+  const addCategory = async (categoryName, categoryType) => {
+    try {
+      const newCategory = await categoriesAPI.create({ name: categoryName, type: categoryType });
+      setCategories(prev => [...prev, newCategory]);
+      toast({
+        title: "Category Added",
+        description: `Category "${categoryName}" created successfully.`,
+      });
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast({
+        title: "Error",
+        description: errorMessage,
+      });
+    }
+  };
 
-    // update local state so dropdowns refresh immediately
-    setCategories(prev => [...prev, newCategory]);
-
-    toast({
-      title: "Category Added",
-      description: `Category "${categoryName}" created successfully.`,
-    });
-  } catch (err) {
-    const errorMessage = handleApiError(err);
-    toast({
-      title: "Error",
-      description: errorMessage,
-    });
-  }
-};
+  const deleteCategory = async (categoryId) => {
+    try {
+      await categoriesAPI.delete(categoryId);
+      
+      // Remove from local state
+      setCategories(prev => prev.filter(cat => cat.id !== categoryId));
+      
+      toast({
+        title: "Category Deleted",
+        description: "Category removed successfully.",
+      });
+    } catch (err) {
+      const errorMessage = handleApiError(err);
+      toast({
+        title: "Error deleting category",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
+  };
 
 
   const deleteTransaction = async (transactionId) => {
@@ -271,7 +287,7 @@ const addCategory = async (categoryName, categoryType) => {
           </TabsContent>
 
           <TabsContent value="categories">
-            <CategoryManager categories={categories} onAddCategory={addCategory} />
+            <CategoryManager categories={categories} onAddCategory={addCategory} onDeleteCategory={deleteCategory} />
           </TabsContent>
 
           <TabsContent value="charts">
