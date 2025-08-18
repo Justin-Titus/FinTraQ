@@ -1,4 +1,4 @@
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from motor.core import AgnosticDatabase as AsyncIOMotorDatabase
 from models.category import Category
 from models.transaction import Transaction
 from datetime import date, datetime
