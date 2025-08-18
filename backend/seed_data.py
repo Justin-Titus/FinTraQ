@@ -1,4 +1,4 @@
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from motor.core import AgnosticDatabase as AsyncIOMotorDatabase
 from models.category import Category
 from models.transaction import Transaction
 from datetime import date, datetime
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     import os
     from motor.motor_asyncio import AsyncIOMotorClient
     
-    mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+    mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://justintitus007:BRnBvAhjffY25JrN@fintraq.wafizzs.mongodb.net/?retryWrites=true&w=majority&appName=FinTraQ')
     db_name = os.environ.get('DB_NAME', 'FinTraQ')
     
     client = AsyncIOMotorClient(mongo_url)
