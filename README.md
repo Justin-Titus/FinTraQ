@@ -91,10 +91,99 @@ npm start
 *React app runs on http://localhost:3000*
 
 ### 5. Environment Configuration
-Create `.env` in frontend directory:
+
+FinTraQ requires environment variables for each component. Create the following `.env` files:
+
+#### Frontend Environment (frontend/.env)
 ```env
+# Backend API URL - points to the Node.js auth gateway
 REACT_APP_BACKEND_URL=http://localhost:5001
 ```
+
+#### Python Backend Environment (backend/.env)
+```env
+# MongoDB Connection (use your MongoDB Atlas connection string)
+MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=FinTraQ
+DB_NAME=FinTraQ
+
+# CORS Configuration
+CORS_ORIGINS=http://localhost:3000
+```
+
+#### Node.js Auth Backend Environment (backend-node/.env)
+```env
+# Environment
+NODE_ENV=development
+
+# Server Configuration
+PORT=5001
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:3000
+
+# MongoDB Connection (same as Python backend)
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=FinTraQ
+
+# JWT Configuration (generate secure random strings)
+ACCESS_TOKEN_SECRET=your-super-secure-random-string-here
+ACCESS_TOKEN_TTL=15m
+REFRESH_TOKEN_TTL_DAYS=7
+
+# Python Backend URL (for proxying data requests)
+PYTHON_BACKEND_URL=http://localhost:8000
+```
+
+#### Setting Up MongoDB Atlas
+
+1. **Create MongoDB Atlas Account**: Visit [MongoDB Atlas](https://www.mongodb.com/atlas)
+2. **Create a Cluster**: Follow the free tier setup
+3. **Create Database User**:
+   - Go to Database Access → Add New Database User
+   - Choose "Password" authentication
+   - Set username and strong password
+   - Grant "Read and write to any database" privileges
+4. **Get Connection String**:
+   - Go to Database → Connect → Connect your application
+   - Choose "Driver: Node.js" and copy the connection string
+   - Replace `<username>`, `<password>`, and `<dbname>` with your values
+5. **Network Access**:
+   - Go to Network Access → Add IP Address
+   - For development: "Allow Access from Anywhere" (0.0.0.0/0)
+   - For production: Add specific IP addresses
+
+#### Environment Variables Guide
+
+| Variable | Component | Description | Example |
+|----------|-----------|-------------|---------|
+| `REACT_APP_BACKEND_URL` | Frontend | URL to Node.js auth gateway | `http://localhost:5001` |
+| `MONGO_URL` | Python Backend | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/...` |
+| `MONGO_URI` | Node.js Backend | Same MongoDB connection for auth | `mongodb+srv://user:pass@cluster.mongodb.net/...` |
+| `DB_NAME` | Python Backend | Database name in MongoDB | `FinTraQ` |
+| `ACCESS_TOKEN_SECRET` | Node.js Backend | JWT signing secret (generate secure) | `your-secure-random-string` |
+| `PYTHON_BACKEND_URL` | Node.js Backend | URL to Python FastAPI service | `http://localhost:8000` |
+| `PORT` | Node.js Backend | Port for auth gateway | `5001` |
+| `CORS_ORIGIN` | Node.js Backend | Frontend URL for CORS | `http://localhost:3000` |
+| `CORS_ORIGINS` | Python Backend | Frontend URL for CORS | `http://localhost:3000` |
+
+#### Security Notes
+
+- **Never commit `.env` files** to version control
+- **Generate strong secrets**: Use tools like `openssl rand -base64 32` for `ACCESS_TOKEN_SECRET`
+- **Use different secrets** for development and production
+- **Rotate secrets regularly** in production environments
+
+#### Development vs Production
+
+**Development** (localhost):
+- Use `http://localhost:*` URLs
+- Allow access from anywhere in MongoDB Atlas
+- Shorter token expiration for testing
+
+**Production** (Render/Vercel):
+- Use HTTPS URLs (`https://your-app.onrender.com`)
+- Restrict MongoDB Atlas to specific IP ranges
+- Longer token expiration for better UX
+- Use environment variables in hosting platform
 
 ## 📱 Usage
 
@@ -197,6 +286,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Justin Titus**
 - GitHub: [@Justin-Titus](https://github.com/Justin-Titus)
+- LinkedIn: [Justin Titus](https://www.linkedin.com/in/justin-titus-j)
 
 ## 🙏 Acknowledgments
 
