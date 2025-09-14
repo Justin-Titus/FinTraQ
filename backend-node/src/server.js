@@ -56,7 +56,7 @@ app.get('/api/protected/ping', authMiddleware, (req, res) => {
 });
 
 // Protect and proxy categories/transactions to existing FastAPI
-const FASTAPI_TARGET = process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
+const FASTAPI_TARGET = process.env.PYTHON_BACKEND_URL || process.env.FASTAPI_URL || 'http://127.0.0.1:8000';
 const TENANT_PREFIX = process.env.TENANT_DB_PREFIX || 'fintraq_';
 
 const proxyOptions = {
