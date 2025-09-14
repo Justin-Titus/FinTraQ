@@ -1,15 +1,19 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from typing import Any
 from models.category import Category, CategoryCreate
 from database import get_database
+from seed_data import seed_categories
 
 router = APIRouter(prefix="/api/categories", tags=["categories"])
 
 @router.get("/", response_model=List[Category])
-async def get_categories(db: AsyncIOMotorDatabase = Depends(get_database)):
+async def get_categories(db: Any = Depends(get_database)):
     """Return all categories (predefined + custom)"""
     try:
+        # Lazy seed categories for fresh tenant DBs
+        if await db.categories.count_documents({}) == 0:
+            await seed_categories(db)
         cursor = db.categories.find({})
         categories = await cursor.to_list(1000)
         # Ensure Pydantic model validation / defaults are applied
@@ -18,7 +22,7 @@ async def get_categories(db: AsyncIOMotorDatabase = Depends(get_database)):
         raise HTTPException(status_code=500, detail=f"Error fetching categories: {str(e)}")
 
 @router.post("/", response_model=Category)
-async def create_category(category_in: CategoryCreate, db: AsyncIOMotorDatabase = Depends(get_database)):
+async def create_category(category_in: CategoryCreate, db: Any = Depends(get_database)):
     """Create a new category (must be income or expense)"""
     try:
         if category_in.type not in ("income", "expense"):
@@ -36,7 +40,7 @@ async def create_category(category_in: CategoryCreate, db: AsyncIOMotorDatabase 
         raise HTTPException(status_code=500, detail=f"Error creating category: {str(e)}")
 
 @router.delete("/{category_id}")
-async def delete_category(category_id: str, db: AsyncIOMotorDatabase = Depends(get_database)):
+async def delete_category(category_id: str, db: Any = Depends(get_database)):
     """Delete a category if no transactions reference its name"""
     try:
         category_doc = await db.categories.find_one({"id": category_id})

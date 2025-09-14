@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from typing import List, Optional
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from typing import Any
 from datetime import datetime, date
 from models.transaction import Transaction, TransactionCreate, MonthlySummary
 from database import get_database
@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/transactions", tags=["transactions"])
 @router.get("/", response_model=List[Transaction])
 async def get_transactions(
     month: Optional[str] = Query(None, description="Filter by month (YYYY-MM format)"),
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: Any = Depends(get_database)
 ):
     """Get all transactions with optional month filter"""
     try:
@@ -19,7 +19,7 @@ async def get_transactions(
             # Validate month format
             try:
                 datetime.strptime(month, "%Y-%m")
-                query["transaction_date"] = {"₹regex": f"^{month}"}
+                query["transaction_date"] = {"$regex": f"^{month}"}
             except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
@@ -35,7 +35,7 @@ async def get_transactions(
 @router.post("/", response_model=Transaction)
 async def create_transaction(
     transaction_data: TransactionCreate,
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: Any = Depends(get_database)
 ):
     """Create a new transaction"""
     try:
@@ -64,7 +64,7 @@ async def create_transaction(
 @router.delete("/{transaction_id}")
 async def delete_transaction(
     transaction_id: str,
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: Any = Depends(get_database)
 ):
     """Delete a transaction"""
     try:
@@ -81,7 +81,7 @@ async def delete_transaction(
 @router.get("/summary/{month}", response_model=MonthlySummary)
 async def get_monthly_summary(
     month: str,
-    db: AsyncIOMotorDatabase = Depends(get_database)
+    db: Any = Depends(get_database)
 ):
     """Get monthly summary for a specific month"""
     try:
@@ -92,7 +92,7 @@ async def get_monthly_summary(
             raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
         # Get transactions for the month
-        cursor = db.transactions.find({"transaction_date": {"₹regex": f"^{month}"}})
+        cursor = db.transactions.find({"transaction_date": {"$regex": f"^{month}"}})
         transactions = await cursor.to_list(1000)
         
         total_income = sum(t["amount"] for t in transactions if t["transaction_type"] == "income")

@@ -68,3 +68,12 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Configure API URL
+Create a `.env` file and set the backend base URL (Node auth gateway):
+
+```
+REACT_APP_BACKEND_URL=http://localhost:5001
+```
+
+Ensure the FastAPI service is available at `http://127.0.0.1:8000` (or update `FASTAPI_URL` in the Node `.env`).

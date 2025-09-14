@@ -62,7 +62,7 @@ const CategoryManager = ({ categories = [], onAddCategory, onDeleteCategory }) =
             <label
               key={opt.value}
               htmlFor={opt.value}
-              className={`flex items-center gap-1 cursor-pointer ₹{opt.color}`}
+              className={`flex items-center gap-1 cursor-pointer ${opt.color}`}
             >
               <input
                 type="radio"

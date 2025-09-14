@@ -7,16 +7,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { useToast } from '../hooks/use-toast';
-import { PlusCircle, Wallet, TrendingUp, TrendingDown, Calendar, PieChart, Loader2 } from 'lucide-react';
+import { PlusCircle, Wallet, TrendingUp, TrendingDown, Calendar, PieChart, Loader2, LogOut } from 'lucide-react';
 import { categoriesAPI, transactionsAPI, handleApiError } from '../services/api';
 import ExpenseForm from './ExpenseForm';
 import IncomeForm from './IncomeForm';
 import CategoryManager from './CategoryManager';
 import ChartDashboard from './ChartDashboard';
 import TransactionList from './TransactionList';
+import { useAuth } from '../context/AuthContext';
 
 const FinTraQ = () => {
   const { toast } = useToast();
+  const { user, logout } = useAuth();
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -165,9 +167,13 @@ const FinTraQ = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-yellow-50 flex items-center justify-center">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 animate-fade-in">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <Wallet className="h-10 w-10 text-orange-500 animate-pulse" />
+            <h1 className="text-3xl font-bold text-gray-800">FinTraQ</h1>
+          </div>
           <Loader2 className="h-12 w-12 animate-spin text-orange-500 mx-auto" />
-          <h2 className="text-2xl font-semibold text-gray-800">Loading FinTraQ...</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Loading...</h2>
           <p className="text-gray-600">Please wait while we fetch your data</p>
         </div>
       </div>
@@ -194,12 +200,40 @@ const FinTraQ = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-yellow-50 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-800 flex items-center justify-center gap-2">
-            <Wallet className="h-10 w-10 text-orange-500" />
-            FinTraQ - Budget Planner
-          </h1>
+        <div className="flex flex-col items-center gap-2">
+          <div className="w-full grid grid-cols-1 md:grid-cols-3 items-center gap-4">
+            <div className="hidden md:block"></div>
+            <div className="flex items-center gap-2 justify-self-center">
+              <Wallet className="h-8 w-8 sm:h-10 sm:w-10 text-orange-500" />
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 whitespace-nowrap">FinTraQ - Budget Planner</h1>
+            </div>
+            <div className="hidden md:flex items-center gap-3 justify-self-end">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Signed in as</p>
+                <p className="text-sm font-medium text-gray-800">{user?.name || user?.email}</p>
+              </div>
+              <Button
+                variant="outline"
+                className="border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                onClick={logout}
+              >
+                <LogOut className="h-4 w-4" /> Logout
+              </Button>
+            </div>
+          </div>
           <p className="text-gray-600">Track your income and expenses with ease</p>
+          {/* Mobile user info */}
+          <div className="md:hidden flex items-center justify-center gap-3 mt-1">
+            <span className="text-sm text-gray-700">{user?.name || user?.email}</span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+              onClick={logout}
+            >
+              <LogOut className="h-4 w-4" /> Logout
+            </Button>
+          </div>
         </div>
 
         {/* Month Selector & Summary Cards */}

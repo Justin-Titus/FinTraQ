@@ -70,11 +70,17 @@ module.exports = {
   				to: {
   					height: '0'
   				}
-  			}
+			},
+			'slow-pan': {
+				'0%': { backgroundPosition: '0% 0%' },
+				'50%': { backgroundPosition: '100% 100%' },
+				'100%': { backgroundPosition: '0% 0%' }
+			}
   		},
   		animation: {
-  			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+			'accordion-down': 'accordion-down 0.2s ease-out',
+			'accordion-up': 'accordion-up 0.2s ease-out',
+			'slow-pan': 'slow-pan 25s ease-in-out infinite'
   		}
   	}
   },
