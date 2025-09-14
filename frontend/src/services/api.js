@@ -1,12 +1,21 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken, clearAccessToken } from './token';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+const DATA_BACKEND_URL = process.env.REACT_APP_DATA_BACKEND_URL || 'http://localhost:8000';
 const API_BASE = `${BACKEND_URL}/api`;
 
-// Create axios instance with default config
+// Create axios instance with default config for auth backend
 const api = axios.create({
   baseURL: API_BASE,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Create axios instance for data backend (Python FastAPI)
+const dataApi = axios.create({
+  baseURL: DATA_BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -86,17 +95,17 @@ api.interceptors.response.use(
 // Categories API
 export const categoriesAPI = {
   getAll: async () => {
-    const response = await api.get('/categories/');
+    const response = await dataApi.get('/categories/');
     return response.data;
   },
   
   create: async (categoryData) => {
-    const response = await api.post('/categories/', categoryData);
+    const response = await dataApi.post('/categories/', categoryData);
     return response.data;
   },
   
   delete: async (categoryId) => {
-    const response = await api.delete(`/categories/${categoryId}`);
+    const response = await dataApi.delete(`/categories/${categoryId}`);
     return response.data;
   }
 };
@@ -105,7 +114,7 @@ export const categoriesAPI = {
 export const transactionsAPI = {
   getAll: async (month = null) => {
     const params = month ? { month } : {};
-    const response = await api.get('/transactions/', { params });
+    const response = await dataApi.get('/transactions/', { params });
     
     // Map backend response to frontend format
     return response.data.map(transaction => ({
@@ -126,7 +135,7 @@ export const transactionsAPI = {
       category: transactionData.category,
       description: transactionData.description
     };
-    const response = await api.post('/transactions/', backendData);
+    const response = await dataApi.post('/transactions/', backendData);
     
     // Map backend response back to frontend format
     const transaction = response.data;
@@ -141,12 +150,12 @@ export const transactionsAPI = {
   },
   
   delete: async (transactionId) => {
-    const response = await api.delete(`/transactions/${transactionId}`);
+    const response = await dataApi.delete(`/transactions/${transactionId}`);
     return response.data;
   },
   
   getSummary: async (month) => {
-    const response = await api.get(`/transactions/summary/${month}`);
+    const response = await dataApi.get(`/transactions/summary/${month}`);
     const summary = response.data;
     return {
       totalIncome: summary.total_income,
