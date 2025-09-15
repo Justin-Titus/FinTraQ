@@ -1,0 +1,54 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment variables
+.env*
+
+# Test, dev, and linting tools
+*.log
+*.coverage
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Notebooks and data
+*.ipynb
+*.csv
+*.tsv
+*.parquet
+*.feather
+*.h5
+*.hdf5
+*.db
+*.sqlite
+*.sqlite3
+*.bak
+*.tmp
+*.temp
+
+# Docs and configs
+README.md
+*.md
+*.rst
+*.toml
+*.ini
+*.cfg
+*.yml
+*.yaml
+
+# Build and dist
+build/
+dist/
+.eggs/
+*.egg-info/
