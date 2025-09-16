@@ -9,6 +9,7 @@ __pycache__/
 .venv/
 venv/
 ENV/
+env/
 
 # Environment variables
 .env*
@@ -52,3 +53,24 @@ build/
 dist/
 .eggs/
 *.egg-info/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Procfile and other deployment configs
+Procfile
+
+# Development requirements
+requirements.txt
+requirements-dev.txt

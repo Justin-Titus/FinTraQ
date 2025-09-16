@@ -1,44 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "250mb",
-        "includeFiles": [
-          "models/**",
-          "routes/**"
-        ],
-        "excludeFiles": [
-          "__pycache__/**",
-          "*.pyc",
-          "*.pyo",
-          "*.pyd",
-          "*.so",
-          "*.log",
-          "*.md",
-          "*.rst",
-          "*.ipynb",
-          "*.csv",
-          "*.tsv",
-          "*.parquet",
-          "*.feather",
-          "*.h5",
-          "*.hdf5",
-          "*.db",
-          "*.sqlite*",
-          "*.bak",
-          "*.tmp",
-          "*.egg-info/**",
-          "build/**",
-          "dist/**",
-          ".venv/**",
-          "venv/**"
-        ]
-      }
+  "functions": {
+    "server.py": {
+      "runtime": "python3.9"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -46,7 +12,7 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "PYTHONPATH": "."
   },
-  "installCommand": "pip install -r requirements-prod.txt"
+  "installCommand": "pip install --no-cache-dir --no-deps fastapi uvicorn python-dotenv pymongo motor pydantic python-multipart"
 }
