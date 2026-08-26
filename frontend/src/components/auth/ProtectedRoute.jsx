@@ -1,13 +1,13 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import { getAccessToken } from '../../services/token';
 import { useAuth } from '../../context/AuthContext';
-import AuthPanel from './AuthPanel';
+import LandingPage from '../LandingPage';
 import { Loader2, Wallet } from 'lucide-react';
 
 export default function ProtectedRoute({ children }) {
   const { user, authReady } = useAuth();
   const token = getAccessToken();
+
   if (!authReady) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-orange-50 to-yellow-50 flex items-center justify-center">
@@ -23,6 +23,8 @@ export default function ProtectedRoute({ children }) {
       </div>
     );
   }
-  if (!user || !token) return <AuthPanel />;
+
+  if (!user || !token) return <LandingPage />;
+
   return children;
 }

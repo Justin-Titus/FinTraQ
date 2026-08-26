@@ -49,6 +49,17 @@ const FinTraQ = () => {
 
       setCategories(categoriesData);
       setTransactions(transactionsData);
+
+      // Auto-switch month to latest transaction's month if current month has 0 transactions
+      if (transactionsData && transactionsData.length > 0) {
+        const currentMonthCount = transactionsData.filter(t => t.date && t.date.startsWith(selectedMonth)).length;
+        if (currentMonthCount === 0) {
+          const latestDate = transactionsData[0].date;
+          if (latestDate && latestDate.length >= 7) {
+            setSelectedMonth(latestDate.slice(0, 7));
+          }
+        }
+      }
     } catch (err) {
       const errorMessage = handleApiError(err);
       setError(errorMessage);

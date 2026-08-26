@@ -16,12 +16,20 @@ async def get_transactions(
     """Get all transactions for authenticated user with optional month filter"""
     try:
         user_id = current_user.get("id") or str(current_user.get("_id"))
-        query = {"user_id": user_id}
+        query = {
+            "$or": [
+                {"user_id": user_id},
+                {"user_id": None},
+                {"user_id": {"$exists": False}}
+            ]
+        }
         
         if month:
             try:
                 datetime.strptime(month, "%Y-%m")
-                query["transaction_date"] = {"$regex": f"^{month}"}
+                query["$and"] = [
+                    {"$or": [{"transaction_date": {"$regex": f"^{month}"}}, {"date": {"$regex": f"^{month}"}}]}
+                ]
             except ValueError:
                 raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
@@ -110,13 +118,25 @@ async def get_monthly_summary(
             raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
         cursor = db.transactions.find({
-            "user_id": user_id,
-            "transaction_date": {"$regex": f"^{month}"}
+            "$or": [
+                {"user_id": user_id},
+                {"user_id": None},
+                {"user_id": {"$exists": False}}
+            ],
+            "$and": [
+                {"$or": [{"transaction_date": {"$regex": f"^{month}"}}, {"date": {"$regex": f"^{month}"}}]}
+            ]
         })
         transactions = await cursor.to_list(1000)
         
-        total_income = sum(t["amount"] for t in transactions if t["transaction_type"] == "income")
-        total_expenses = sum(t["amount"] for t in transactions if t["transaction_type"] == "expense")
+        total_income = sum(
+            t.get("amount", 0) for t in transactions 
+            if (t.get("transaction_type") == "income" or t.get("type") == "income")
+        )
+        total_expenses = sum(
+            t.get("amount", 0) for t in transactions 
+            if (t.get("transaction_type") == "expense" or t.get("type") == "expense")
+        )
         balance = total_income - total_expenses
         
         return MonthlySummary(

@@ -110,12 +110,12 @@ export const transactionsAPI = {
     
     // Map backend response to frontend format
     return response.data.map(transaction => ({
-      id: transaction.id,
-      type: transaction.transaction_type,
-      amount: transaction.amount,
+      id: transaction.id || transaction._id,
+      type: transaction.type || transaction.transaction_type,
+      amount: Number(transaction.amount || 0),
       category: transaction.category,
-      description: transaction.description,
-      date: transaction.transaction_date
+      description: transaction.description || '',
+      date: transaction.date || transaction.transaction_date || (transaction.created_at ? transaction.created_at.slice(0, 10) : '')
     }));
   },
   
