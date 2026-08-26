@@ -2,6 +2,7 @@
 
 <div align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
   <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white" />
@@ -34,9 +35,8 @@ A modern, secure personal finance tracking application built with React and Fast
 
 ```
 FinTraQ/
-├── frontend/          # React 18 + TailwindCSS + shadcn/ui
-├── backend/           # FastAPI (Data, Business Logic & Auth)
-└── tests/             # Test suite
+├── frontend/          # React 18 + Vite + TailwindCSS + shadcn/ui
+└── backend/           # FastAPI (Data, Business Logic & Auth)
 ```
 
 ### Tech Stack
@@ -182,7 +182,9 @@ FinTraQ/
 │   │   ├── services/         # API services (axios interceptors)
 │   │   ├── context/          # React Context (AuthContext)
 │   │   └── hooks/            # Custom React hooks
-│   └── public/               # Static assets
+│   ├── public/               # Static assets
+│   ├── index.html            # Vite HTML entrypoint
+│   └── vite.config.js        # Vite & dev proxy configuration
 ├── backend/
 │   ├── models/               # Pydantic models & PyMongo schemas
 │   ├── routes/               # FastAPI routers (auth, transactions, categories)
@@ -190,7 +192,6 @@ FinTraQ/
 │   ├── database.py           # MongoDB connection pooling
 │   ├── dependencies.py       # FastAPI auth dependencies
 │   └── server.py             # FastAPI entrypoint
-└── tests/                    # Test files
 ```
 
 ## 🤝 Contributing
