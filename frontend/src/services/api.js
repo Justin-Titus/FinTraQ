@@ -162,10 +162,7 @@ export const handleApiError = (error) => {
   if (error.response) {
     return error.response.data?.detail || error.response.data?.error || `Server error: ${error.response.status}`;
   } else if (error.request) {
-    let diagnostic = error.message || 'Unknown network error';
-    if (error.code) diagnostic += ` | code: ${error.code}`;
-    diagnostic += ` | config: ${error.config ? JSON.stringify({url: error.config.url, headers: error.config.headers}) : 'N/A'}`;
-    return `Network error: ${diagnostic} - Please check connection and backend status.`;
+    return 'Unable to connect to server. Please check your connection or try again in a few seconds (the server may be starting up).';
   } else {
     return error.message || 'An unexpected error occurred';
   }
