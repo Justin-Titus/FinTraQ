@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useRef, useState, useEffect } from 'react';
 import api, { handleApiError, authAPI } from '../services/api';
-import { setAccessToken, clearAccessToken } from '../services/token';
+import { setAccessToken, clearAccessToken, onTokenClear } from '../services/token';
 
 const AuthContext = createContext(null);
 
@@ -11,6 +11,14 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const hasTriedRefresh = useRef(false);
+
+  // Subscribe to token clear events (e.g. expired session or logout)
+  useEffect(() => {
+    const unsubscribe = onTokenClear(() => {
+      setUser(null);
+    });
+    return unsubscribe;
+  }, []);
 
   // Silent refresh on initial load to keep SPA logged in after reload
   useEffect(() => {

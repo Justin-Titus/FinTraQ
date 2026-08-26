@@ -6,7 +6,7 @@ import AuthPanel from './AuthPanel';
 import { Loader2, Wallet } from 'lucide-react';
 
 export default function ProtectedRoute({ children }) {
-  const { authReady } = useAuth();
+  const { user, authReady } = useAuth();
   const token = getAccessToken();
   if (!authReady) {
     return (
@@ -23,6 +23,6 @@ export default function ProtectedRoute({ children }) {
       </div>
     );
   }
-  if (!token) return <AuthPanel />;
+  if (!user || !token) return <AuthPanel />;
   return children;
 }

@@ -277,19 +277,28 @@ const FinTraQ = () => {
               </CardContent>
             </Card>
 
-            <Card className={`bg-gradient-to-r ${summary.balance >= 0 ? 'from-blue-100 to-cyan-100 border-blue-200' : 'from-orange-100 to-red-100 border-orange-200'}`}>
+            <Card className={`bg-gradient-to-r ${summary.balance > 0 ? 'from-blue-100 to-cyan-100 border-blue-200' : summary.balance < 0 ? 'from-orange-100 to-red-100 border-orange-200' : 'from-gray-100 to-slate-100 border-gray-200'}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={`text-sm font-medium ${summary.balance >= 0 ? 'text-blue-700' : 'text-orange-700'}`}>Balance</p>
-                    <p className={`text-2xl font-bold ${summary.balance >= 0 ? 'text-blue-800' : 'text-orange-800'}`}>
+                    <p className={`text-sm font-medium ${summary.balance > 0 ? 'text-blue-700' : summary.balance < 0 ? 'text-orange-700' : 'text-gray-700'}`}>Balance</p>
+                    <p className={`text-2xl font-bold ${summary.balance > 0 ? 'text-blue-800' : summary.balance < 0 ? 'text-orange-800' : 'text-gray-800'}`}>
                       ₹{summary.balance.toFixed(2)}
                     </p>
-                    <Badge variant={summary.balance >= 0 ? 'default' : 'destructive'} className="mt-1">
-                      {summary.balance >= 0 ? 'Surplus' : 'Deficit'}
+                    <Badge 
+                      variant="outline" 
+                      className={`mt-1 border-transparent ${
+                        summary.balance > 0 
+                          ? 'bg-blue-200 text-blue-800 hover:bg-blue-300' 
+                          : summary.balance < 0 
+                            ? 'bg-red-200 text-red-800 hover:bg-red-300' 
+                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      }`}
+                    >
+                      {summary.balance > 0 ? 'Surplus' : summary.balance < 0 ? 'Deficit' : 'Balanced'}
                     </Badge>
                   </div>
-                  <PieChart className={`h-8 w-8 ${summary.balance >= 0 ? 'text-blue-600' : 'text-orange-600'}`} />
+                  <PieChart className={`h-8 w-8 ${summary.balance > 0 ? 'text-blue-600' : summary.balance < 0 ? 'text-orange-600' : 'text-gray-600'}`} />
                 </div>
               </CardContent>
             </Card>

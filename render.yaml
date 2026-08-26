@@ -1,0 +1,34 @@
+services:
+  # Python Data & Auth Backend (Unified FastAPI Service)
+  - type: web
+    name: fintraq-backend
+    runtime: python
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && python -m uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URL
+        sync: false  # Add manually in Render dashboard (e.g. mongodb+srv://...)
+      - key: DB_NAME
+        value: FinTraQ
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: CORS_ORIGIN
+        value: https://fintraq.onrender.com
+
+  # React Frontend
+  - type: web
+    name: fintraq
+    runtime: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/build
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://fintraq-backend.onrender.com

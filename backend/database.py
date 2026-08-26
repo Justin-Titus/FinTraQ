@@ -2,27 +2,22 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from typing import Any
 import os
 from dotenv import load_dotenv
-from fastapi import Request, HTTPException
+from fastapi import Request
 
 load_dotenv()
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-default_db_name = os.environ['DB_NAME']
-db = client[default_db_name]
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/fintraq')
+db_name = os.environ.get('DB_NAME', 'fintraq')
 
-async def get_database(request: Request) -> Any:
+# Instantiate a single global client for connection pooling
+client = AsyncIOMotorClient(mongo_url)
+db = client[db_name]
+
+async def get_database(request: Request = None) -> Any:
     """
-    Dependency to get database instance. Supports per-user database via header `X-Tenant-DB`.
-    Fallbacks to default DB when header is absent.
+    Dependency returning the MongoDB database instance.
+    Reuses the global connection pool.
     """
-    tenant_db = request.headers.get('X-Tenant-DB')
-    if tenant_db:
-        # Basic safeguard to allow only alphanumerics, dash, underscore
-        if not all(ch.isalnum() or ch in ('-', '_') for ch in tenant_db):
-            raise HTTPException(status_code=400, detail='Invalid tenant database name')
-        return client[tenant_db]
     return db
 
 async def close_database():

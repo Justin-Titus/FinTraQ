@@ -3,12 +3,11 @@
 <div align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white" />
   <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" />
   <img src="https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
   <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white" />
 </div>
 
-A modern, secure personal finance tracking application built with React, FastAPI, and Node.js. FinTraQ helps you manage your income and expenses with an intuitive interface, comprehensive charts, and secure authentication.
+A modern, secure personal finance tracking application built with React and FastAPI. FinTraQ helps you manage your income and expenses with an intuitive interface, comprehensive charts, and secure authentication.
 
 ## ✨ Features
 
@@ -20,10 +19,10 @@ A modern, secure personal finance tracking application built with React, FastAPI
 - **Visual Dashboard**: Interactive charts and graphs for spending insights
 
 ### 🔐 Security & Authentication
-- **JWT Authentication**: Secure access and refresh token system
+- **JWT Authentication**: Secure access and refresh token system powered by FastAPI
 - **Protected Routes**: All sensitive data behind authentication
 - **Session Management**: Automatic token refresh and secure logout
-- **httpOnly Cookies**: Refresh tokens stored securely
+- **Password Hashing**: Secure bcrypt password hashing
 
 ### 🎨 User Experience
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
@@ -36,15 +35,14 @@ A modern, secure personal finance tracking application built with React, FastAPI
 ```
 FinTraQ/
 ├── frontend/          # React 18 + TailwindCSS + shadcn/ui
-├── backend/           # FastAPI (Data & Business Logic)
-├── backend-node/      # Node.js + Express (Authentication Gateway)
-└── tests/            # Test suite
+├── backend/           # FastAPI (Data, Business Logic & Auth)
+└── tests/             # Test suite
 ```
 
 ### Tech Stack
 - **Frontend**: React 18, TailwindCSS, shadcn/ui, Lucide React Icons
-- **Backend Data**: FastAPI, Python, SQLite/PostgreSQL
-- **Backend Auth**: Node.js, Express, JWT
+- **Backend**: FastAPI, Python, Motor (Async MongoDB), JWT, Passlib
+- **Database**: MongoDB Atlas
 - **Development**: Hot reload, ESLint, Prettier
 
 ## 🚀 Quick Start
@@ -64,40 +62,29 @@ cd FinTraQ
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate  # Windows
+.\.venv\Scripts\activate  # Windows
 # source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
-python server.py
+python -m uvicorn server:app --reload
 ```
 *FastAPI runs on http://localhost:8000*
 
-### 3. Setup Node.js Auth Gateway
-```bash
-cd backend-node
-copy .env.example .env  # Windows
-# cp .env.example .env  # macOS/Linux
-# Edit .env and set a strong ACCESS_TOKEN_SECRET
-npm install
-npm run dev
-```
-*Auth gateway runs on http://localhost:5001*
-
-### 4. Setup React Frontend
+### 3. Setup React Frontend
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
 *React app runs on http://localhost:3000*
 
-### 5. Environment Configuration
+### 4. Environment Configuration
 
-FinTraQ requires environment variables for each component. Create the following `.env` files:
+FinTraQ requires environment variables for both components. Create the following `.env` files:
 
 #### Frontend Environment (frontend/.env)
 ```env
-# Backend API URL - points to the Node.js auth gateway
-REACT_APP_BACKEND_URL=http://localhost:5001
+# Backend API URL - points to the FastAPI server
+VITE_BACKEND_URL=http://localhost:8000
 ```
 
 #### Python Backend Environment (backend/.env)
@@ -106,31 +93,14 @@ REACT_APP_BACKEND_URL=http://localhost:5001
 MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=FinTraQ
 DB_NAME=FinTraQ
 
-# CORS Configuration
-CORS_ORIGINS=http://localhost:3000
-```
-
-#### Node.js Auth Backend Environment (backend-node/.env)
-```env
-# Environment
-NODE_ENV=development
-
-# Server Configuration
-PORT=5001
+# JWT Auth Configuration (generate a secure random string)
+SECRET_KEY=your-super-secure-random-string-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # CORS Configuration
 CORS_ORIGIN=http://localhost:3000
-
-# MongoDB Connection (same as Python backend)
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority&appName=FinTraQ
-
-# JWT Configuration (generate secure random strings)
-ACCESS_TOKEN_SECRET=your-super-secure-random-string-here
-ACCESS_TOKEN_TTL=15m
-REFRESH_TOKEN_TTL_DAYS=7
-
-# Python Backend URL (for proxying data requests)
-PYTHON_BACKEND_URL=http://localhost:8000
 ```
 
 #### Setting Up MongoDB Atlas
@@ -144,46 +114,16 @@ PYTHON_BACKEND_URL=http://localhost:8000
    - Grant "Read and write to any database" privileges
 4. **Get Connection String**:
    - Go to Database → Connect → Connect your application
-   - Choose "Driver: Node.js" and copy the connection string
-   - Replace `<username>`, `<password>`, and `<dbname>` with your values
+   - Choose "Driver: Python" and copy the connection string
+   - Replace `<username>` and `<password>` with your values
 5. **Network Access**:
    - Go to Network Access → Add IP Address
    - For development: "Allow Access from Anywhere" (0.0.0.0/0)
-   - For production: Add specific IP addresses
-
-#### Environment Variables Guide
-
-| Variable | Component | Description | Example |
-|----------|-----------|-------------|---------|
-| `REACT_APP_BACKEND_URL` | Frontend | URL to Node.js auth gateway | `http://localhost:5001` |
-| `MONGO_URL` | Python Backend | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/...` |
-| `MONGO_URI` | Node.js Backend | Same MongoDB connection for auth | `mongodb+srv://user:pass@cluster.mongodb.net/...` |
-| `DB_NAME` | Python Backend | Database name in MongoDB | `FinTraQ` |
-| `ACCESS_TOKEN_SECRET` | Node.js Backend | JWT signing secret (generate secure) | `your-secure-random-string` |
-| `PYTHON_BACKEND_URL` | Node.js Backend | URL to Python FastAPI service | `http://localhost:8000` |
-| `PORT` | Node.js Backend | Port for auth gateway | `5001` |
-| `CORS_ORIGIN` | Node.js Backend | Frontend URL for CORS | `http://localhost:3000` |
-| `CORS_ORIGINS` | Python Backend | Frontend URL for CORS | `http://localhost:3000` |
 
 #### Security Notes
 
 - **Never commit `.env` files** to version control
-- **Generate strong secrets**: Use tools like `openssl rand -base64 32` for `ACCESS_TOKEN_SECRET`
-- **Use different secrets** for development and production
-- **Rotate secrets regularly** in production environments
-
-#### Development vs Production
-
-**Development** (localhost):
-- Use `http://localhost:*` URLs
-- Allow access from anywhere in MongoDB Atlas
-- Shorter token expiration for testing
-
-**Production** (Render/Vercel):
-- Use HTTPS URLs (`https://your-app.onrender.com`)
-- Restrict MongoDB Atlas to specific IP ranges
-- Longer token expiration for better UX
-- Use environment variables in hosting platform
+- **Generate strong secrets**: Use tools like `openssl rand -hex 32` for `SECRET_KEY`
 
 ## 📱 Usage
 
@@ -195,38 +135,28 @@ PYTHON_BACKEND_URL=http://localhost:8000
 
 ## 🔒 Security Features
 
-- **Token-based Authentication**: JWT access tokens (15 min) + refresh tokens (7 days)
-- **Secure Storage**: Refresh tokens in httpOnly cookies with SameSite protection
-- **Auto Token Rotation**: Seamless token refresh without user intervention
-- **Protected API Routes**: All financial data behind authentication
-- **Memory-only Access Tokens**: No sensitive data in localStorage
+- **Token-based Authentication**: JWT access tokens (30 min) + refresh tokens (7 days)
+- **Auto Token Rotation**: Seamless token refresh via Axios interceptors
+- **Protected API Routes**: All financial data behind `Depends(get_current_user)` authentication
+- **Memory-only Access Tokens**: No sensitive access tokens stored in localStorage
 
-## 🎯 API Endpoints
+## 🎯 API Endpoints (FastAPI - Port 8000)
 
-### Authentication (Node.js - Port 5001)
-- `POST /auth/register` - User registration
-- `POST /auth/login` - User login
-- `POST /auth/refresh` - Token refresh
-- `POST /auth/logout` - Secure logout
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/refresh-token` - Token refresh
+- `POST /api/auth/logout` - Secure logout
+- `GET  /api/auth/me` - Get current user info
 
-### Data API (FastAPI - Port 8000, Proxied via Node.js)
-- `GET/POST /api/transactions` - Transaction management
-- `GET/POST /api/categories` - Category management
-- `DELETE /api/transactions/:id` - Delete transaction
-- `DELETE /api/categories/:id` - Delete category
+### Data API
+- `GET/POST /api/transactions/` - Transaction management
+- `DELETE   /api/transactions/{id}` - Delete transaction
+- `GET      /api/transactions/summary/{month}` - Get monthly summary
+- `GET/POST /api/categories/` - Category management
+- `DELETE   /api/categories/{id}` - Delete category
 
 ## 🛠 Development
-
-### Running Tests
-```bash
-cd tests
-python -m pytest
-```
-
-### Code Style
-- **Frontend**: ESLint + Prettier for React/JavaScript
-- **Backend**: Black + Flake8 for Python
-- **Commits**: Conventional commits preferred
 
 ### Building for Production
 ```bash
@@ -237,10 +167,6 @@ npm run build
 # Backend
 cd backend
 # Deploy with gunicorn/uvicorn
-
-# Node Gateway
-cd backend-node
-npm run start
 ```
 
 ## 📁 Project Structure
@@ -253,20 +179,17 @@ FinTraQ/
 │   │   │   ├── ui/           # shadcn/ui components
 │   │   │   ├── auth/         # Authentication components
 │   │   │   └── ...           # Feature components
-│   │   ├── services/         # API services
-│   │   ├── hooks/            # Custom React hooks
-│   │   └── utils/            # Utility functions
+│   │   ├── services/         # API services (axios interceptors)
+│   │   ├── context/          # React Context (AuthContext)
+│   │   └── hooks/            # Custom React hooks
 │   └── public/               # Static assets
 ├── backend/
-│   ├── models/               # Data models
-│   ├── routes/               # API routes
-│   └── database.py           # Database configuration
-├── backend-node/
-│   ├── src/
-│   │   ├── routes/           # Auth routes
-│   │   ├── models/           # User models
-│   │   └── middleware/       # JWT middleware
-│   └── server.js             # Express server
+│   ├── models/               # Pydantic models & PyMongo schemas
+│   ├── routes/               # FastAPI routers (auth, transactions, categories)
+│   ├── utils/                # JWT and Password hashing utilities
+│   ├── database.py           # MongoDB connection pooling
+│   ├── dependencies.py       # FastAPI auth dependencies
+│   └── server.py             # FastAPI entrypoint
 └── tests/                    # Test files
 ```
 
@@ -287,14 +210,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Justin Titus**
 - GitHub: [@Justin-Titus](https://github.com/Justin-Titus)
 - LinkedIn: [Justin Titus](https://www.linkedin.com/in/justin-titus-j)
-
-## 🙏 Acknowledgments
-
-- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
-- [Lucide](https://lucide.dev/) for clean, modern icons
-- [TailwindCSS](https://tailwindcss.com/) for utility-first styling
-- [FastAPI](https://fastapi.tiangolo.com/) for the powerful Python backend
-- [React](https://reactjs.org/) for the frontend framework
 
 ---
 

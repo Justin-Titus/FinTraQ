@@ -11,6 +11,7 @@ class TransactionCreate(BaseModel):
 
 class Transaction(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: Optional[str] = None
     transaction_type: Literal['income', 'expense']
     amount: float
     category: str

@@ -1,22 +1,24 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from typing import List, Optional
-from typing import Any
+from typing import List, Optional, Any
 from datetime import datetime, date
 from models.transaction import Transaction, TransactionCreate, MonthlySummary
 from database import get_database
+from dependencies import get_current_user
 
 router = APIRouter(prefix="/api/transactions", tags=["transactions"])
 
 @router.get("/", response_model=List[Transaction])
 async def get_transactions(
     month: Optional[str] = Query(None, description="Filter by month (YYYY-MM format)"),
-    db: Any = Depends(get_database)
+    db: Any = Depends(get_database),
+    current_user: dict = Depends(get_current_user)
 ):
-    """Get all transactions with optional month filter"""
+    """Get all transactions for authenticated user with optional month filter"""
     try:
-        query = {}
+        user_id = current_user.get("id") or str(current_user.get("_id"))
+        query = {"user_id": user_id}
+        
         if month:
-            # Validate month format
             try:
                 datetime.strptime(month, "%Y-%m")
                 query["transaction_date"] = {"$regex": f"^{month}"}
@@ -35,23 +37,36 @@ async def get_transactions(
 @router.post("/", response_model=Transaction)
 async def create_transaction(
     transaction_data: TransactionCreate,
-    db: Any = Depends(get_database)
+    db: Any = Depends(get_database),
+    current_user: dict = Depends(get_current_user)
 ):
-    """Create a new transaction"""
+    """Create a new transaction for authenticated user"""
     try:
-        # Verify category exists
-        category = await db.categories.find_one({"name": transaction_data.category})
+        user_id = current_user.get("id") or str(current_user.get("_id"))
+        
+        # Verify category exists (predefined or user custom category)
+        category = await db.categories.find_one({
+            "name": transaction_data.category,
+            "$or": [
+                {"user_id": None},
+                {"user_id": {"$exists": False}},
+                {"user_id": user_id}
+            ]
+        })
         if not category:
             raise HTTPException(status_code=400, detail="Category does not exist")
         
-        # Create transaction
-        transaction = Transaction(**transaction_data.dict())
+        # Create transaction scoped to current user
+        transaction = Transaction(
+            user_id=user_id,
+            **transaction_data.dict()
+        )
         transaction_dict = transaction.dict()
         
         # Convert date objects to strings for MongoDB
-        if 'transaction_date' in transaction_dict:
+        if 'transaction_date' in transaction_dict and isinstance(transaction_dict['transaction_date'], (date, datetime)):
             transaction_dict['transaction_date'] = transaction_dict['transaction_date'].isoformat()
-        if 'created_at' in transaction_dict:
+        if 'created_at' in transaction_dict and isinstance(transaction_dict['created_at'], datetime):
             transaction_dict['created_at'] = transaction_dict['created_at'].isoformat()
         
         await db.transactions.insert_one(transaction_dict)
@@ -64,13 +79,15 @@ async def create_transaction(
 @router.delete("/{transaction_id}")
 async def delete_transaction(
     transaction_id: str,
-    db: Any = Depends(get_database)
+    db: Any = Depends(get_database),
+    current_user: dict = Depends(get_current_user)
 ):
-    """Delete a transaction"""
+    """Delete a transaction owned by authenticated user"""
     try:
-        result = await db.transactions.delete_one({"id": transaction_id})
+        user_id = current_user.get("id") or str(current_user.get("_id"))
+        result = await db.transactions.delete_one({"id": transaction_id, "user_id": user_id})
         if result.deleted_count == 0:
-            raise HTTPException(status_code=404, detail="Transaction not found")
+            raise HTTPException(status_code=404, detail="Transaction not found or not owned by user")
         
         return {"message": "Transaction deleted successfully"}
     except HTTPException:
@@ -81,18 +98,21 @@ async def delete_transaction(
 @router.get("/summary/{month}", response_model=MonthlySummary)
 async def get_monthly_summary(
     month: str,
-    db: Any = Depends(get_database)
+    db: Any = Depends(get_database),
+    current_user: dict = Depends(get_current_user)
 ):
-    """Get monthly summary for a specific month"""
+    """Get monthly summary for authenticated user"""
     try:
-        # Validate month format
+        user_id = current_user.get("id") or str(current_user.get("_id"))
         try:
             datetime.strptime(month, "%Y-%m")
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid month format. Use YYYY-MM")
         
-        # Get transactions for the month
-        cursor = db.transactions.find({"transaction_date": {"$regex": f"^{month}"}})
+        cursor = db.transactions.find({
+            "user_id": user_id,
+            "transaction_date": {"$regex": f"^{month}"}
+        })
         transactions = await cursor.to_list(1000)
         
         total_income = sum(t["amount"] for t in transactions if t["transaction_type"] == "income")

@@ -44,14 +44,18 @@ SAMPLE_TRANSACTIONS = [
 async def seed_categories(db: AsyncIOMotorDatabase):
     """Seed predefined categories if they don't exist"""
     try:
+        seeded_count = 0
         for cat_data in PREDEFINED_CATEGORIES:
             existing = await db.categories.find_one({"name": cat_data["name"]})
             if not existing:
                 category = Category(name=cat_data["name"], type=cat_data["type"])
                 await db.categories.insert_one(category.dict())
                 print(f"✓ Seeded category: {cat_data['name']}")
+                seeded_count += 1
         
-        print("✅ Categories seeding completed")
+        if seeded_count > 0:
+            print(f"✅ Seeded {seeded_count} new predefined categories")
+        # If seeded_count == 0, we don't print anything to avoid console spam on every restart
     except Exception as e:
         print(f"❌ Error seeding categories: {e}")
 

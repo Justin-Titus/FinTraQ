@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken, clearAccessToken } from './token';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? '';
 const API_BASE = `${BACKEND_URL}/api`;
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_BASE,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -159,13 +160,13 @@ export const transactionsAPI = {
 // Utility function to handle API errors
 export const handleApiError = (error) => {
   if (error.response) {
-    // Server responded with error status
-    return error.response.data?.detail || error.response.data?.error || 'Server error occurred';
+    return error.response.data?.detail || error.response.data?.error || `Server error: ${error.response.status}`;
   } else if (error.request) {
-    // Request was made but no response received
-    return 'Network error - please check your connection';
+    let diagnostic = error.message || 'Unknown network error';
+    if (error.code) diagnostic += ` | code: ${error.code}`;
+    diagnostic += ` | config: ${error.config ? JSON.stringify({url: error.config.url, headers: error.config.headers}) : 'N/A'}`;
+    return `Network error: ${diagnostic} - Please check connection and backend status.`;
   } else {
-    // Something else happened
     return error.message || 'An unexpected error occurred';
   }
 };
